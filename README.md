@@ -1,34 +1,37 @@
-# Make + Gemini: AI-assisted customer reply workflow
+# Make + Gemini Reply Assistant
 
-A no-code automation that reads a customer message from Google Sheets, asks Google Gemini to draft a polite reply, and writes it back to the sheet. A human reviews the reply before it is sent.
+A prototype that turns customer messages into reply drafts for human review.
+The draft goes back into Google Sheets, where a person can review it before
+sending anything to a customer.
 
-## How it works
-Google Sheets (Watch New Rows) → Gemini (Generate a response) → Google Sheets (Update a Row)
+## Workflow
 
-## Tools
-- Make (free plan)
-- Google AI Studio, Gemini 3.8 Flash
-- Google Sheets
+1. **Google Sheets — Watch New Rows** picks up a new customer message.
+2. **Gemini — Generate a response** drafts a short reply. The prompt asks Gemini
+   to match the customer's language and writing style, including French, Darija,
+   or Arabizi, and to avoid inventing prices or appointments.
+3. **Google Sheets — Update a Row** writes the draft back to the source row.
 
-## Design choices
-- The system prompt asks the model to reply in the customer's language and writing style (Darija, French, Arabizi), keep answers short, and never invent prices or appointments.
-- All test messages are fictional.
+## Try it with sample data
 
-## Status
-Prototype. The full chain worked end to end for one row.
+1. Create a test sheet with `Customer message` and `Draft reply` columns.
+2. In Make, connect Google Sheets and Gemini. Set up the three modules above.
+3. Pass the message column to Gemini. In the final module, map the row number
+   from the trigger and Gemini's draft text to `Draft reply`.
+4. Run the scenario and add a fictional message, such as
+   `Salam, wach katkhdmo nhar l7ed?`
+5. Check that the draft appears on the same row and avoids claiming Sunday
+   opening hours unless those hours were provided.
 
-## Known issues
-- Row 3: Make reports a successful write, but the target cell stays empty (cause not found yet).
-- One run was stopped by Make after 10 minutes because a Gemini call returned no result.
+## Prototype status
 
-## What I learned
-- A spreadsheet ID is not the file name.
-- Map a specific field, not a whole bundle.
-- Prompts should forbid inventing facts such as prices.
+The workflow ran end to end for one row. Two issues are documented:
 
-## Security notes
-- No API keys are stored in this repository.
-- Screenshots in the report have personal identifiers masked.
+| Observation | Next check |
+| --- | --- |
+| Make reported a successful update, but the reply cell on row 3 stayed empty. | Inspect the row number and reply field passed to the final module. |
+| Make stopped one run after 10 minutes when Gemini returned no result. | Inspect the Gemini module output and repeat the test with fictional messages. |
 
-## Full report
-See the `docs` folder (French).
+Use fictional messages for testing and keep credentials in Make connections.
+
+[Read the full project report in French](Rapport_Projet_Automatisation_Make_Gemini.pdf)
